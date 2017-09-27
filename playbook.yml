@@ -1,0 +1,35 @@
+---
+- name: ubuntu mirror cron
+  hosts: all
+  become: yes
+  vars:
+    cron_mirror_enabled: true
+    mirror_script_dir: "/home/{{ ansible_user }}"
+    mirror_doc_root: /srv/www
+    mirror_unix_user: "{{ ansible_user }}"
+    mirror_unix_group: "{{ ansible_user }}"
+    ubuntu_mirror_packages_source: "mirror.pnl.gov"
+    ubuntu_mirror_cron_minute: 0
+    ubuntu_mirror_cron_hour: "4,10,16,20"
+  tasks:
+    - file:
+        path: "{{ mirror_doc_root }}"
+        owner: "{{ mirror_unix_user }}"
+        group: "{{ mirror_unix_group }}"
+        state: directory
+    - template:
+        src: "ubuntu-mirror.j2"
+        dest: "{{ mirror_script_dir }}/ubuntu-mirror"
+        owner: "{{ mirror_unix_user }}"
+        group: "{{ mirror_unix_group }}"
+        mode : "0700"
+    - cron:
+        name: ansible_ubuntu_mirror
+        cron_file: ansible_ubuntu_mirror
+        job: "{{ mirror_script_dir }}/ubuntu-mirror >/dev/null 2>&1"
+        state: present
+        disabled: "{{ cron_mirror_enabled }}"
+        user: "{{ mirror_unix_user }}"
+        hour: "{{ ubuntu_mirror_cron_hour }}"
+        minute: "{{ ubuntu_mirror_cron_minute }}"
+
