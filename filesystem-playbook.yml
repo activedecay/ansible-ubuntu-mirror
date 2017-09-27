@@ -1,0 +1,8 @@
+---
+- name: consume the virsh filesystem on vdb
+  hosts: all
+  become: yes
+  tasks:
+   - filesystem: "fstype=ext4 dev=/dev/vdb"
+   - mount: "src=/dev/vdb path=/var/www/html/repo state=present fstype=ext4"
+

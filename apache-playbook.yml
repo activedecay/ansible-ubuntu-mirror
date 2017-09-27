@@ -1,0 +1,17 @@
+---
+- name: apt-repository thing
+  hosts: all
+  become: true
+  tasks:
+    - name: set timezone to America/Denver
+      timezone:
+        name: America/Denver
+    - apt: 
+        name: apache2
+    - name: vagrant user rights to apache's /var/www/html
+      file:
+        path: /var/www/html
+        recurse: yes
+        owner: vagrant
+        group: vagrant
+
